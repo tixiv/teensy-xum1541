@@ -20,6 +20,7 @@
 #define OPENCBM_PLUGIN_H
 
 #include "opencbm.h"
+#include <getopt.h>
 
 /*! \brief @@@@@ \todo document
 

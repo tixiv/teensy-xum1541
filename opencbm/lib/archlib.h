@@ -16,7 +16,7 @@
 
 #include "opencbm-plugin.h"
 
-#if defined WIN32
+#if defined WIN32 || defined(MINGW64)
 
 # if defined OPENCBM_PLUGIN
 #  define EXTERN __declspec(dllexport) /*!< we are exporting the functions */

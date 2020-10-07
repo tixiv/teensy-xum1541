@@ -26,7 +26,15 @@
 #include "version.h"
 #define OPENCBM_VERSION OPENCBM_VERSION_STRING
 
-#ifdef WIN32
+#ifdef MINGW64
+# define ARCH_CBM_LINUX_WIN( _linux, _win) _linux
+
+# include <windows.h>
+# include <unistd.h>
+# include <errno.h>
+# include <stdbool.h>
+
+#elif defined (WIN32)
 # define ARCH_CBM_LINUX_WIN( _linux, _win) _win
 
 # include <stdio.h>
@@ -77,11 +85,11 @@ typedef bool BOOL;
 #define arch_sleep(_x)  ARCH_CBM_LINUX_WIN(sleep(_x), Sleep((_x) * 1000))
 #define arch_usleep(_x) ARCH_CBM_LINUX_WIN(usleep(_x), Sleep( ((_x) + 999) / 1000))
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(MINGW64)
  extern void arch_error(int AUnused, unsigned int ErrorCode, const char *format, ...);
  extern char *arch_strerror(unsigned int ErrorCode);
 #else
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(MINGW64)
  extern void arch_error(int AUnused, unsigned int ErrorCode, const char *format, ...);
 #else
 # define arch_error error

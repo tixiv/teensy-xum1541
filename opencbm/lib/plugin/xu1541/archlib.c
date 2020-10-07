@@ -17,7 +17,7 @@
 **
 ****************************************************************/
 
-#ifdef WIN32
+#if defined(WIN32) || defined(MINGW64)
 #include <windows.h>
 #include <windowsx.h>
 
@@ -65,7 +65,7 @@
 */
 
 const char * CBMAPIDECL
-opencbm_plugin_get_driver_name(const char * const Port)
+opencbm_plugin_get_driver_name(const char * Port)
 {
     UNREFERENCED_PARAMETER(Port);
 
@@ -93,7 +93,7 @@ opencbm_plugin_get_driver_name(const char * const Port)
 */
 
 int CBMAPIDECL
-opencbm_plugin_driver_open(CBM_FILE *HandleDevice, const char * const Port)
+opencbm_plugin_driver_open(CBM_FILE *HandleDevice, const char * Port)
 {
     UNREFERENCED_PARAMETER(Port);
 

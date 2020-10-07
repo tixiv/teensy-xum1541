@@ -21,7 +21,7 @@
 **
 ****************************************************************/
 
-#ifdef WIN32
+#if defined(WIN32) || defined(MINGW64)
 #include <windows.h>
 #include <windowsx.h>
 

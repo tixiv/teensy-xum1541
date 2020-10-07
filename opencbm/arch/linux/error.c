@@ -33,7 +33,7 @@
 void arch_error(int AUnused, unsigned int ErrorCode, const char *Format, ...)
 {
     va_list ap;
-    char ErrorMessageBuffer[2048];
+    char ErrorMessageBuffer[4096];
     char ErrorMessageBuffer2[2048];
     char *errorText = NULL;
 

@@ -32,7 +32,7 @@ extern "C" {
 
 #include <sys/types.h>
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(MINGW64)
   /* we have windows */
 
 #include <windows.h>
@@ -83,7 +83,11 @@ extern void vdd_usleep(CBM_FILE f, unsigned int howlong);
 
 # define EXTERN extern /*!< EXTERN is not defined on Linux */
 # define CBMAPIDECL /*!< CBMAPIDECL is a dummy on Linux */
+
+#ifndef MINGW64
 # define WINAPI /*!< WINAPI is a dummy on Linux */
+#endif
+
 # define CBM_FILE intptr_t /*!< The "file descriptor" for an opened driver */
 # define CBM_FILE_INVALID ((CBM_FILE)-1) /*!< An invalid "file descriptor" (CBM_FILE) */
 
