@@ -86,6 +86,8 @@ EXTERN opencbm_plugin_s1_read_n_t                  opencbm_plugin_s1_read_n;
 EXTERN opencbm_plugin_s1_write_n_t                 opencbm_plugin_s1_write_n;
 EXTERN opencbm_plugin_s2_read_n_t                  opencbm_plugin_s2_read_n;
 EXTERN opencbm_plugin_s2_write_n_t                 opencbm_plugin_s2_write_n;
+EXTERN opencbm_plugin_s3_read_n_t                  opencbm_plugin_s3_read_n;
+EXTERN opencbm_plugin_s3_write_n_t                 opencbm_plugin_s3_write_n;
 EXTERN opencbm_plugin_pp_dc_read_n_t               opencbm_plugin_pp_dc_read_n;
 EXTERN opencbm_plugin_pp_dc_write_n_t              opencbm_plugin_pp_dc_write_n;
 EXTERN opencbm_plugin_pp_cc_read_n_t               opencbm_plugin_pp_cc_read_n;

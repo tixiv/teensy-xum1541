@@ -135,7 +135,8 @@ extern transfer_funcs d64copy_fs_transfer,
                       d64copy_std_transfer,
                       d64copy_pp_transfer,
                       d64copy_s1_transfer,
-                      d64copy_s2_transfer;
+                      d64copy_s2_transfer,
+                      d64copy_s3_transfer;
 
 static d64copy_message_cb message_cb;
 static d64copy_status_cb status_cb;
@@ -635,6 +636,7 @@ transfers[] =
     { &d64copy_std_transfer, "original", "o%" },
     { &d64copy_s1_transfer, "serial1", "s1" },
     { &d64copy_s2_transfer, "serial2", "s2" },
+    { &d64copy_s3_transfer, "serial3", "s3" },
     { &d64copy_pp_transfer, "parallel", "p%" },
     { NULL, NULL, NULL }
 };

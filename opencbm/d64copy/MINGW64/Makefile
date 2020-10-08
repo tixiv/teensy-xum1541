@@ -4,7 +4,7 @@ include ${RELATIVEPATH}MINGW64/config.make
 LIBD64COPY=../libd64copy
 
 OBJS = main.o \
- 	  $(foreach t,d64copy fs gcr pp s1 s2 std, $(LIBD64COPY)/$(t).o)
+ 	  $(foreach t,d64copy fs gcr pp s1 s2 s3 std, $(LIBD64COPY)/$(t).o)
 
 PROG = d64copy
 
@@ -16,7 +16,8 @@ EXTRA_A65_INC= \
   $(LIBD64COPY)/turboread1541.inc $(LIBD64COPY)/turbowrite1541.inc \
   $(LIBD64COPY)/turboread1571.inc $(LIBD64COPY)/turbowrite1571.inc \
   $(LIBD64COPY)/pp1541.inc $(LIBD64COPY)/pp1571.inc \
-  $(LIBD64COPY)/s1.inc $(LIBD64COPY)/s2.inc
+  $(LIBD64COPY)/s1.inc $(LIBD64COPY)/s2.inc \
+  $(LIBD64COPY)/s3.inc
 
 $(LIBD64COPY)/d64copy.o $(LIBD64COPY)/d64copy.lo: \
   $(LIBD64COPY)/d64copy.c $(LIBD64COPY)/d64copy_int.h \
@@ -40,6 +41,9 @@ $(LIBD64COPY)/s1.o $(LIBD64COPY)/s1.lo: \
 $(LIBD64COPY)/s2.o $(LIBD64COPY)/s2.lo: \
   $(LIBD64COPY)/s2.c ../include/opencbm.h $(LIBD64COPY)/d64copy_int.h \
   ../include/d64copy.h $(LIBD64COPY)/gcr.h $(LIBD64COPY)/s2.inc
+$(LIBD64COPY)/s3.o $(LIBD64COPY)/s3.lo: \
+  $(LIBD64COPY)/s3.c ../include/opencbm.h $(LIBD64COPY)/d64copy_int.h \
+  ../include/d64copy.h $(LIBD64COPY)/gcr.h $(LIBD64COPY)/s3.inc
 $(LIBD64COPY)/std.o $(LIBD64COPY)/std.lo: \
   $(LIBD64COPY)/std.c ../include/opencbm.h \
   $(LIBD64COPY)/d64copy_int.h ../include/d64copy.h $(LIBD64COPY)/gcr.h

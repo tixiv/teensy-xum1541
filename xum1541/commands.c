@@ -692,6 +692,10 @@ usbHandleBulk(uint8_t *request, uint8_t *status)
             ioReadLoop(s2_read_byte, len);
             ret = 0;
             break;
+        case XUM1541_S3:
+            ioReadLoop(s3_read_byte, len);
+            ret = 0;
+            break;
         case XUM1541_PP:
             ioRead2Loop(pp_read_2_bytes, len);
             ret = 0;
@@ -752,6 +756,10 @@ usbHandleBulk(uint8_t *request, uint8_t *status)
             break;
         case XUM1541_S2:
             ioWriteLoop(s2_write_byte, len);
+            ret = 0;
+            break;
+        case XUM1541_S3:
+            ioWriteLoop(s3_write_byte, len);
             ret = 0;
             break;
         case XUM1541_PP:

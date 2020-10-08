@@ -4,7 +4,7 @@ include ${RELATIVEPATH}LINUX/config.make
 LIBD64COPY=../libd64copy
 
 OBJS = main.o \
- 	  $(foreach t,d64copy fs gcr pp s1 s2 std, $(LIBD64COPY)/$(t).o)
+ 	  $(foreach t,d64copy fs gcr pp s1 s2 s3 std, $(LIBD64COPY)/$(t).o)
 
 PROG = d64copy
 
