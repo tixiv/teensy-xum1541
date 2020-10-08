@@ -131,6 +131,7 @@ build: $(OBJS)
 	${CC} $(CFLAGS) -o obj/$(MODEL)/$(MODELVERSION).bin $(OBJS) $(LDFLAGS)
 	${AVRSIZE}         obj/$(MODEL)/$(MODELVERSION).bin
 	${OBJCOPY} -O ihex obj/$(MODEL)/$(MODELVERSION).bin $(MODELVERSION).hex
+	avr-objdump -d obj/$(MODEL)/$(MODELVERSION).bin > obj/$(MODEL)/$(MODELVERSION).lst
 	sed -e 's/XUM1541 USB floppy adapter [(]generic[)]/XUM1541 USB floppy adapter ($(MODEL)-v$(XUMFW_VERSION))/' \
 	    -e 's/ VID_16D0&PID_0504$$/ VID_16d0\&PID_0504\&REV_$(REVISION)/' \
 	    < xum1541-generic.inf > $(MODELVERSION).inf
