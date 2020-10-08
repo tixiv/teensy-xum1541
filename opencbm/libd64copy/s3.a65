@@ -56,12 +56,6 @@ gts	jsr gbyte
 	tax
 	rts
 
-;gblk	jsr gbyte
-;	sta ($30),y
-;	iny
-;	bne gblk
-;	rts
-
 sblk	lda ($30),y
 	jsr sbyte
 	iny
@@ -99,13 +93,13 @@ write2	lda $1800
 
 ; Y pointer is passed in
 gblk
-	ldx $30
-	stx gblk_smc+1
 	ldx $31
-	stx gblk_smc+2
+	stx gblk_smc1+2
+	stx gblk_smc2+2
+
+	ldx #$00   ; 2
 
 gblk_lp	
-	ldx #$00
 
 :	lda $1800  ; 4
 	bmi :-     ; 2/3 ; wait ATN high
@@ -121,20 +115,39 @@ gblk_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-	ldx #$08   ; 2
-	stx $1800  ; 4   ; clk low (not ready anymore)
+gblk_smc1
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny         ; 2
 
-gblk_smc
-	sta $0400,y
-	iny
-	bne gblk_lp
+:	lda $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+gblk_smc2
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+
+	iny         ; 2
+
+	bne gblk_lp ; 3
 	rts
 
 gbyte	  
-  ; lda #$03   ; debug pin high
-  ; sta $1803
-  ; sta $1801
-
   ldx #$00  
 
 :	lda $1800  ; 4
@@ -153,11 +166,6 @@ gbyte
 
 	ldx #$08   ; 2
 	stx $1800  ; 4   ; clk low (not ready anymore)
-		
-	; sta TMP
-
-  ; ldx #$00   ; debug pin low
-  ; stx $1801
 
 	rts
 	

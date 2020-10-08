@@ -75,23 +75,17 @@ static int read_block(unsigned char tr, unsigned char se, unsigned char *block)
 
 static int write_block(unsigned char tr, unsigned char se, const unsigned char *blk, int size, int read_status)
 {
-    unsigned char status;
-                                                                        SETSTATEDEBUG((void)0);
-    write_n(&tr, 1);
-                                                                        SETSTATEDEBUG((void)0);
-    write_n(&se, 1);
-                                                                        SETSTATEDEBUG(DebugByteCount=0);
-    write_n(blk, size);
-                                                                        SETSTATEDEBUG(DebugByteCount=-1);
-#ifndef USE_CBM_IEC_WAIT
-    if(size == BLOCKSIZE) {
-        arch_usleep(20000);
-    }
-#endif
-                                                                        SETSTATEDEBUG((void)0);
-    read_n(&status, 1);
-                                                                        SETSTATEDEBUG((void)0);
-    return status;
+  unsigned char buf[size + 2];
+  buf[0] = tr;
+  buf[1] = se;
+  memcpy(buf + 2, blk, size);
+
+  unsigned char status;
+  write_n(buf, size+2);
+
+  read_n(&status, 1);
+
+  return status;
 }
 
 static int open_disk(CBM_FILE fd, d64copy_settings *settings,

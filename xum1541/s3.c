@@ -63,7 +63,8 @@ s3_write_byte(uint8_t c)
     else
         iec_release(IO_DATA);
 
-    DELAY_US(5);
+    // hold data and wait until 1541 is not signaling ready over clk anymore
+    DELAY_US(16);
 
     // back to normal bus state
     iec_set(IO_ATN);
