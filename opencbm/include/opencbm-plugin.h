@@ -532,6 +532,26 @@ typedef int CBMAPIDECL opencbm_plugin_iec_dbg_read_t(CBM_FILE HandleDevice);
 */
 typedef int CBMAPIDECL opencbm_plugin_iec_dbg_write_t(CBM_FILE HandleDevice, unsigned char Value);
 
+/*! \brief Get interleave for warp, transfer mode and track from plugin
+
+ \param HandleDevice
+    Pointer to a CBM_FILE which will contain the file handle of the OpenCBM backend
+
+ \param transfer_mode
+    Index of transfer mode for which to get interleave
+
+ \param warp
+    Set whether to get intrleave for warp mode
+
+ \param track
+    Track for which to get interleave
+
+ \return
+    Returns the interleave requested by plugin for settings given. The plugin can
+    also choose to return -1 for some settings, which means the user should use
+    his normal interleave setting and not the one from the plugin.
+*/
+typedef int CBMAPIDECL opencbm_plugin_get_interleave_t(CBM_FILE HandleDevice, int transfer_mode, unsigned char warp, int track);
 
 /*! \brief holds all callbacks of the plugin
 

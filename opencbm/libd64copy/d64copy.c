@@ -14,6 +14,7 @@
 #include <assert.h>
 
 #include "arch.h"
+#include "opencbm-plugin.h"
 
 
 static const char d64_sector_map[MAX_TRACKS+1] =
@@ -93,9 +94,44 @@ static const struct drive_prog
     {sizeof(warp_write_1571), warp_write_1571}
 };
 
+static opencbm_plugin_get_interleave_t * getPluginGetInterleave()
+{
+  static opencbm_plugin_get_interleave_t * p;
+  static int first_call = 1;
 
-static const int default_interleave[] = { -1, 17, 4, 13, 7, -1 };
-static const int warp_write_interleave[] = { -1, 0, 6, 12, 4, -1 };
+  if(first_call)
+  {
+    p = cbm_get_plugin_function_address("opencbm_plugin_get_interleave");
+    first_call = 0;
+  }
+
+  return p;
+}
+
+static int get_interleave(CBM_FILE HandleDevice, const d64copy_settings *settings, bool dst_is_cbm, int track)
+{
+  static const int default_interleave[] = { -1, 17, 4, 13, 7, 7, -1 };
+  static const int warp_write_interleave[] = { -1, 0, 6, 12, 4, 4, -1 };
+
+  int use_warp = (dst_is_cbm && settings->warp);
+
+  if(settings->interleave != -1)
+    return settings->interleave;
+
+  else if (getPluginGetInterleave())
+  {
+    int interleave = getPluginGetInterleave()(HandleDevice, settings->transfer_mode, use_warp, track);
+    if(interleave != -1)
+      return interleave;
+  }
+
+  int interleave = use_warp ?
+        warp_write_interleave[settings->transfer_mode] :
+        default_interleave[settings->transfer_mode];
+
+  assert(interleave >= 0);
+  return interleave;
+}
 
 
 /*
@@ -246,16 +282,6 @@ static int copy_disk(CBM_FILE fd_cbm, d64copy_settings *settings,
                 "invalid value (%d) for end track", settings->end_track);
         return -1;
     }
-
-    if(settings->interleave == -1)
-    {
-        settings->interleave = (dst->is_cbm_drive && settings->warp) ?
-            warp_write_interleave[settings->transfer_mode] :
-            default_interleave[settings->transfer_mode];
-
-        assert(settings->interleave >= 0);
-    }
-
 
     if(settings->drive_type == cbm_dt_unknown )
     {
@@ -583,8 +609,8 @@ static int copy_disk(CBM_FILE fd_cbm, d64copy_settings *settings,
 
                     if(dst->is_cbm_drive || !settings->warp)
                     {
-                        se += (unsigned char) settings->interleave;
-                        if(se >= sector_map[tr]) se -= sector_map[tr];
+                      se += (unsigned char) get_interleave(fd_cbm, settings, dst->is_cbm_drive, tr);
+                      if(se >= sector_map[tr]) se -= sector_map[tr];
                     }
                 }
                 if(errors > 0 && settings->retries >= 0)
@@ -636,8 +662,8 @@ transfers[] =
     { &d64copy_std_transfer, "original", "o%" },
     { &d64copy_s1_transfer, "serial1", "s1" },
     { &d64copy_s2_transfer, "serial2", "s2" },
-    { &d64copy_s3_transfer, "serial3", "s3" },
     { &d64copy_pp_transfer, "parallel", "p%" },
+    { &d64copy_s3_transfer, "serial3", "s3" },
     { NULL, NULL, NULL }
 };
 

@@ -302,3 +302,31 @@ opencbm_plugin_nib_write_n(CBM_FILE HandleDevice, const unsigned char *data, uns
 {
     return xum1541_write((struct opencbm_usb_handle *)HandleDevice, XUM1541_NIB, data, size);
 }
+
+/*! \brief Get interleave for given warp, transfer mode and track from plugin
+
+ \param HandleDevice
+    Pointer to a CBM_FILE which will contain the file handle of the OpenCBM backend
+
+ \param transfer_mode
+    Index of transfer mode for which to get interleave
+
+ \param warp
+    Set whether to get intrleave for warp mode or not (0 == no warp)
+
+ \param track
+    Track for which to get interleave
+
+ \return
+    Returns the interleave requested by plugin for settings given. The plugin can
+    also choose to return -1 for some settings, which means the user should use
+    his normal interleave setting and not the one from the plugin.
+*/
+int CBMAPIDECL
+opencbm_plugin_get_interleave(CBM_FILE HandleDevice, int transfer_mode, unsigned char warp, int track)
+{
+    if (warp && transfer_mode == 5)
+      return track >= 18 ? 3 : 4;
+
+    return -1;
+}
