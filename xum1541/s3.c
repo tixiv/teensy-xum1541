@@ -77,31 +77,46 @@ s3_write_byte(uint8_t c)
 uint8_t
 s3_read_byte(void)
 {
-    uint8_t c, i;
+    uint8_t c = 0;
 
-    c = 0;
-    for (i = 4; i != 0; i--) {
-        // Receive first bit, waiting for CLK and releasing ATN to ack.
-        while (iec_get(IO_CLK)) {
-            if (!TimerWorker())
-                return -1;
-        }
-        // Pause each time CLK changes to be sure DATA is stable.
-        IEC_DELAY();
-        c = (c >> 1) | (iec_get(IO_DATA) ? 0x80 : 0);
-        iec_release(IO_ATN);
+    cli();
 
-        // Receive second bit, waiting for CLK to be released and setting ATN
-        // to ack.
-        while (!iec_get(IO_CLK)) {
-            if (!TimerWorker())
-                return -1;
-        }
-        // Pause each time CLK changes to be sure DATA is stable.
-        IEC_DELAY();
-        c = (c >> 1) | (iec_get(IO_DATA) ? 0x80 : 0);
-        iec_set(IO_ATN);
-    }
+    iec_release(IO_ATN);
+    while (iec_get(IO_CLK)); // sync with floppy
+
+    DELAY_US(9);
+
+    if (iec_get(IO_CLK))
+        c |= 0x08;
+    if (iec_get(IO_DATA))
+        c |= 0x02;
+
+    DELAY_US(12);
+
+    if (iec_get(IO_CLK))
+        c |= 0x04;
+    if (iec_get(IO_DATA))
+        c |= 0x01;
+
+    DELAY_US(10);
+
+    if (iec_get(IO_CLK))
+        c |= 0x80;
+    if (iec_get(IO_DATA))
+        c |= 0x20;
+
+    DELAY_US(8);
+
+    if (iec_get(IO_CLK))
+        c |= 0x40;
+    if (iec_get(IO_DATA))
+        c |= 0x10;
+
+    iec_set(IO_ATN); // back to normal bus state
+
+    sei();
+
+    DELAY_US(4);
 
     return c;
 }

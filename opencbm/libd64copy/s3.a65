@@ -62,28 +62,6 @@ sblk	lda ($30),y
 	bne sblk
 	rts
 
-sbyte	sta TMP
-	ldx #$04
-write0	lda #$04
-	lsr TMP
-	rol
-	asl
-	sta $1800
-write1	lda $1800
-	bmi write1
-	lda #$02
-	lsr TMP
-	rol
-	asl
-	sta $1800
-write2	lda $1800
-	bpl write2
-	dex
-	bne write0
-	lda #$08
-	sta $1800
-	rts
-
 ;ATN  in  bit 7
 ;ATNA out bit 4
 ;Clk  out bit 3 
@@ -91,6 +69,40 @@ write2	lda $1800
 ;Data out bit 1
 ;Data in  bit 0
 
+sbyte
+	ldx #$03
+	stx $1803
+	stx $1801  ; debug pin high
+
+
+:	ldx $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	ldx #$00   ; 2
+	stx $1800  ; 4   ; clk high (sync)
+
+	tax        ; 2   ; save high nibble
+	and #$0f   ; 2
+	sta $1800  ; 4   ; bits 3(clk) and 1(dat)
+	asl        ; 2   ; 10
+	and #$0f   ; 2
+	sta $1800  ; 4   ; bits 2(clk) and 0(dat)
+	txa        ; 2
+	lsr        ; 2
+	lsr        ; 2   ; 22
+	lsr        ; 2
+	lsr        ; 2
+	sta $1800  ; 4   ; bits 7(clk) and 5(dat)
+	asl        ; 2   ; 32
+	and #$0f   ; 2
+	sta $1800  ; 4   ; bits 6(clk) and 4(dat)
+	
+	ldx #$08   ; 2   ; 40
+	stx $1800  ; 4   ; clk low (not ready anymore)
+
+	stx $1801 ; debug pin low
+
+	rts
+	
 ; Y pointer is passed in
 gblk
 	ldx $31
