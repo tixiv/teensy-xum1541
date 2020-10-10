@@ -1,0 +1,176 @@
+; Copyright 1999 Michael Klein <michael(dot)klein(at)puffin(dot)lb(dot)shuttle(dot)de>
+; All rights reserved.
+;
+; This file is part of OpenCBM
+;
+; Redistribution and use in source and binary forms, with or without
+; modification, are permitted provided that the following conditions are met:
+;
+;     * Redistributions of source code must retain the above copyright
+;       notice, this list of conditions and the following disclaimer.
+;     * Redistributions in binary form must reproduce the above copyright
+;       notice, this list of conditions and the following disclaimer in
+;       the documentation and/or other materials provided with the
+;       distribution.
+;     * Neither the name of the OpenCBM team nor the names of its
+;       contributors may be used to endorse or promote products derived
+;       from this software without specific prior written permission.
+;
+; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+; IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+; TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+; PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+; OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+; EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+; PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+; PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+; LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+; NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+
+	*=$0700
+
+TMP = $86
+
+	jmp gts		; get track/sector
+	jmp gbyte
+	jmp gblk	; receive block
+	jmp sbyte	; send byte
+	jmp sblk	; send block
+	
+	lda #$04
+i0	bit $1800
+	bne i0
+	asl
+	sta $1800
+i1	lda $1800
+	bpl i1
+	rts
+
+gts	jsr gbyte
+	pha
+	jsr gbyte
+	tay
+	pla
+	tax
+	rts
+
+sblk	lda ($30),y
+	jsr sbyte
+	iny
+	bne sblk
+	rts
+
+;ATN  in  bit 7
+;ATNA out bit 4
+;Clk  out bit 3 
+;Clk  in  bit 2 
+;Data out bit 1
+;Data in  bit 0
+
+sbyte
+:	ldx $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	ldx #$00   ; 2
+	stx $1800  ; 4   ; clk high (sync)
+
+	tax        ; 2   ; save high nibble
+	and #$0f   ; 2
+	sta $1800  ; 4   ; bits 3(clk) and 1(dat)
+	asl        ; 2   ; 10
+	and #$0f   ; 2
+	sta $1800  ; 4   ; bits 2(clk) and 0(dat)
+	txa        ; 2
+	lsr        ; 2   ; 20
+	and #$78   ; 2
+	sta $1800  ; 4   ; bits 4(clk) and 5(dat over ATNA)
+	lsr        ; 2
+	lsr        ; 2   ; 30
+	and #$18   ; 2
+	sta $1800  ; 4   ; bits 6(clk) and 7(dat over ATNA)
+		
+	ldx #$08   ; 2   ; 38
+	stx $1800  ; 4   ; clk low (not ready anymore)
+
+	rts
+	
+; Y pointer is passed in
+gblk
+	ldx $31
+	stx gblk_smc1+2
+	stx gblk_smc2+2
+
+	ldx #$00   ; 2
+
+gblk_lp	
+
+:	lda $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+gblk_smc1
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny         ; 2
+
+:	lda $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+gblk_smc2
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+
+	iny         ; 2
+
+	bne gblk_lp ; 3
+	rts
+
+gbyte	  
+  ldx #$00  
+
+:	lda $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+	ldx #$08   ; 2
+	stx $1800  ; 4   ; clk low (not ready anymore)
+
+	rts
+	
+	do_read=*

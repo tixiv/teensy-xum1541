@@ -22,8 +22,12 @@ static opencbm_plugin_s3_read_n_t * opencbm_plugin_s3_read_n = NULL;
 
 static opencbm_plugin_s3_write_n_t * opencbm_plugin_s3_write_n = NULL;
 
-static const unsigned char s3_drive_prog[] = {
-#include "s3.inc"
+static const unsigned char s3_drive_prog_read[] = {
+#include "s3_read.inc"
+};
+
+static const unsigned char s3_drive_prog_write[] = {
+#include "s3_write.inc"
 };
 
 static CBM_FILE fd_cbm;
@@ -98,22 +102,21 @@ static int open_disk(CBM_FILE fd, d64copy_settings *settings,
     two_sided = settings->two_sided;
 
     opencbm_plugin_s3_read_n = cbm_get_plugin_function_address("opencbm_plugin_s3_read_n");
-
     opencbm_plugin_s3_write_n = cbm_get_plugin_function_address("opencbm_plugin_s3_write_n");
 
-                                                                        SETSTATEDEBUG((void)0);
-    cbm_upload(fd_cbm, d, 0x700, s3_drive_prog, sizeof(s3_drive_prog));
-                                                                        SETSTATEDEBUG((void)0);
+    if(for_writing)
+      cbm_upload(fd_cbm, d, 0x700, s3_drive_prog_write, sizeof(s3_drive_prog_write));
+    else
+      cbm_upload(fd_cbm, d, 0x700, s3_drive_prog_read, sizeof(s3_drive_prog_read));
+
     start(fd, d);
-                                                                        SETSTATEDEBUG((void)0);
+
     cbm_iec_release(fd_cbm, IEC_CLOCK);
-                                                                        SETSTATEDEBUG((void)0);
     while(!cbm_iec_get(fd_cbm, IEC_CLOCK));
-                                                                        SETSTATEDEBUG((void)0);
+
     cbm_iec_set(fd_cbm, IEC_ATN);
     arch_usleep(20000);
     
-                                                                        SETSTATEDEBUG((void)0);
     return 0;
 }
 
