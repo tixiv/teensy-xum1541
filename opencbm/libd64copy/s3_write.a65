@@ -101,14 +101,14 @@ sbyte
 ; Y pointer is passed in
 gblk
 	ldx $31
-	stx gblk_smc1+2
-	stx gblk_smc2+2
-	stx gblk_smc3+2
-	stx gblk_smc4+2
+	cpx #$01
+	bne gblk_300
+	jmp gblk_100
 
+gblk_300
 	ldx #$00   ; 2
 
-gblk_lp	
+gblk_300_lp	
 
 :	lda $1800  ; 4
 	bmi :-     ; 2/3 ; wait ATN high
@@ -124,8 +124,7 @@ gblk_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-gblk_smc1
-	sta $0400,y ; 5
+	sta $0300,y ; 5
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
@@ -143,8 +142,7 @@ gblk_smc1
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-gblk_smc2
-	sta $0400,y ; 5
+	sta $0300,y ; 5
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
@@ -162,8 +160,7 @@ gblk_smc2
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-gblk_smc3
-	sta $0400,y ; 5
+	sta $0300,y ; 5
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
@@ -181,14 +178,96 @@ gblk_smc3
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-gblk_smc4
-	sta $0400,y ; 5
+	sta $0300,y ; 5
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
 	iny        ; 2
 
-	bne gblk_lp ; 3
+	bne gblk_300_lp ; 3
+	rts
+
+
+gblk_100
+	ldx #$00   ; 2
+
+gblk_100_lp	
+
+:	lda $1800  ; 4
+	bmi :-     ; 2/3 ; wait ATN high
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+	sta $0100,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
+
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+	sta $0100,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
+
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+	sta $0100,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
+
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+	sta $0100,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
+
+	bne gblk_100_lp ; 3
 	rts
 
 gbyte	  
