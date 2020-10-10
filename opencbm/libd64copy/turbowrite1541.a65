@@ -56,8 +56,9 @@
 
 	jmp main
 
-	jsr init
-	ldy #$64
+	jsr init  ; custom I/O init
+	
+	ldy #$64	; copy ROM routines
 i0	lda $f574,y
 	sta do_write-1,y
 	dey
@@ -67,9 +68,11 @@ i1	lda $d5f8,y
 	sta do_retry,y
 	dey
 	bpl i1
-	lda #$60
-	sta do_write+$64
-	sta do_retry+$37
+	
+	lda #$60	; == RTS
+	sta do_write+$64	; patch
+	sta do_retry+$37	; patch
+	
 	ldx drv
 	lda $feca,x	; led
 	sta $026d	; mask
