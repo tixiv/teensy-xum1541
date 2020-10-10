@@ -81,6 +81,20 @@ static int read_block(unsigned char tr, unsigned char se, unsigned char *block)
     return status;
 }
 
+static void reverse(unsigned char * buf, int len)
+{
+  unsigned char * p1 = buf;
+  unsigned char * p2 = buf + len - 1;
+
+  while(p2 > p1)
+  {
+    unsigned char tmp;
+    tmp = *p1;
+    *p1++ = *p2;
+    *p2-- = tmp;
+  }
+}
+
 static int write_block(unsigned char tr, unsigned char se, const unsigned char *blk, int size, int read_status)
 {
   unsigned char buf[size + 3];
@@ -89,6 +103,13 @@ static int write_block(unsigned char tr, unsigned char se, const unsigned char *
   buf[2] = 0x55; // dummy to get length divisible by 4
 
   memcpy(buf + 3, blk, size);
+
+  if (size == 325) // GCR decoded in warp mode
+  {
+    // reverse the block read by asm routine gblk_100
+    // so it can use pha (3 cycles) instead of sta a16,y (5 cycles)
+    reverse (buf + 4, 68);
+  }
 
   unsigned char status;
   write_n(buf, size+3);

@@ -189,6 +189,11 @@ gblk_300_lp
 
 
 gblk_100
+	tsx      ; 2
+	stx TMP  ; 3
+	ldx #$ff ; 2
+	txs
+	
 	ldx #$00   ; 2
 
 gblk_100_lp	
@@ -207,7 +212,7 @@ gblk_100_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-	sta $0100,y ; 5
+	pha        ; 3
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
@@ -225,8 +230,8 @@ gblk_100_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-	sta $0100,y ; 5
-	
+	pha        ; 3
+		
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
 	iny        ; 2
@@ -243,8 +248,8 @@ gblk_100_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-	sta $0100,y ; 5
-	
+	pha        ; 3
+		
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
 	iny        ; 2
@@ -261,13 +266,17 @@ gblk_100_lp
 	asl        ; 2
 	ora $1800  ; 4   ; bit 2 and 0
 
-	sta $0100,y ; 5
+	pha        ; 3
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
 	iny        ; 2
 
 	bne gblk_100_lp ; 3
+	
+	ldx TMP  ; 3
+	txs      ; 2
+	
 	rts
 
 gbyte	  
