@@ -91,7 +91,7 @@ s3_read_byte(void)
     if (iec_get(IO_DATA))
         c |= 0x02;
 
-    DELAY_US(12);
+    DELAY_US(10);
 
     if (iec_get(IO_CLK))
         c |= 0x04;
@@ -101,7 +101,7 @@ s3_read_byte(void)
     DELAY_US(10);
 
     if (iec_get(IO_CLK))
-        c |= 0x80;
+        c |= 0x10;
     if (iec_get(IO_DATA))
         c |= 0x20;
 
@@ -110,7 +110,7 @@ s3_read_byte(void)
     if (iec_get(IO_CLK))
         c |= 0x40;
     if (iec_get(IO_DATA))
-        c |= 0x10;
+        c |= 0x80;
 
     iec_set(IO_ATN); // back to normal bus state
 

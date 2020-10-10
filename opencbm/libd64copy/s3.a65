@@ -70,11 +70,6 @@ sblk	lda ($30),y
 ;Data in  bit 0
 
 sbyte
-	ldx #$03
-	stx $1803
-	stx $1801  ; debug pin high
-
-
 :	ldx $1800  ; 4
 	bmi :-     ; 2/3 ; wait ATN high
 	ldx #$00   ; 2
@@ -87,19 +82,16 @@ sbyte
 	and #$0f   ; 2
 	sta $1800  ; 4   ; bits 2(clk) and 0(dat)
 	txa        ; 2
+	lsr        ; 2   ; 20
+	and #$78   ; 2
+	sta $1800  ; 4   ; bits 4(clk) and 5(dat over ATNA)
 	lsr        ; 2
-	lsr        ; 2   ; 22
-	lsr        ; 2
-	lsr        ; 2
-	sta $1800  ; 4   ; bits 7(clk) and 5(dat)
-	asl        ; 2   ; 32
-	and #$0f   ; 2
-	sta $1800  ; 4   ; bits 6(clk) and 4(dat)
-	
-	ldx #$08   ; 2   ; 40
+	lsr        ; 2   ; 30
+	and #$18   ; 2
+	sta $1800  ; 4   ; bits 6(clk) and 7(dat over ATNA)
+		
+	ldx #$08   ; 2   ; 38
 	stx $1800  ; 4   ; clk low (not ready anymore)
-
-	stx $1801 ; debug pin low
 
 	rts
 	
