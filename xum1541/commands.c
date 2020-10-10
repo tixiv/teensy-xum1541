@@ -242,6 +242,42 @@ ioWriteLoop(WriteFn_t writeFn, uint16_t len)
     return 0;
 }
 
+
+static uint8_t
+ioWriteLoop_s3(uint16_t len)
+{
+    usbInitIo(len, ENDPOINT_DIR_OUT);
+
+    while (len % 4) {
+        len--;
+        uint8_t data;
+        if (usbRecvByte(&data) != 0)
+            break;
+        cli();
+        s3_write_byte(data);
+        sei();
+    }
+
+    len /= 4;
+    while (len--) {
+        uint8_t data[4];
+        if (usbRecvByte(data+0) != 0) break;
+        if (usbRecvByte(data+1) != 0) break;
+        if (usbRecvByte(data+2) != 0) break;
+        if (usbRecvByte(data+3) != 0) break;
+
+        cli();
+        s3_write_byte(data[0]);
+        s3_write_byte(data[1]);
+        s3_write_byte(data[2]);
+        s3_write_byte(data[3]);
+        sei();
+    }
+
+    usbIoDone();
+    return 0;
+}
+
 static uint8_t
 ioRead2Loop(Read2Fn_t readFn, uint16_t len)
 {
@@ -759,7 +795,7 @@ usbHandleBulk(uint8_t *request, uint8_t *status)
             ret = 0;
             break;
         case XUM1541_S3:
-            ioWriteLoop(s3_write_byte, len);
+            ioWriteLoop_s3(len);
             ret = 0;
             break;
         case XUM1541_PP:

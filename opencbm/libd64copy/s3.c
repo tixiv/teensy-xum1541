@@ -61,31 +61,37 @@ static int read_block(unsigned char tr, unsigned char se, unsigned char *block)
 {
     unsigned char status;
 
-                                                                        SETSTATEDEBUG((void)0);
-    write_n(&tr, 1);
-                                                                        SETSTATEDEBUG((void)0);
-    write_n(&se, 1);
+    unsigned char buf[2];
+    buf[0] = tr;
+    buf[1] = se;
+
+    write_n(buf, 2);
+
 #ifndef USE_CBM_IEC_WAIT
     arch_usleep(20000);
 #endif
-                                                                        SETSTATEDEBUG((void)0);
-    read_n(&status, 1);
-                                                                        SETSTATEDEBUG(DebugByteCount=0);
-    read_n(block, BLOCKSIZE);
-                                                                        SETSTATEDEBUG(DebugByteCount=-1);
+
+    unsigned char rd_buf[BLOCKSIZE + 1];
+
+    read_n(rd_buf, BLOCKSIZE + 1);
+    status = rd_buf[0];
+
+    memcpy (block, rd_buf + 1, BLOCKSIZE);
 
     return status;
 }
 
 static int write_block(unsigned char tr, unsigned char se, const unsigned char *blk, int size, int read_status)
 {
-  unsigned char buf[size + 2];
+  unsigned char buf[size + 3];
   buf[0] = tr;
   buf[1] = se;
-  memcpy(buf + 2, blk, size);
+  buf[2] = 0x55; // dummy to get length divisible by 4
+
+  memcpy(buf + 3, blk, size);
 
   unsigned char status;
-  write_n(buf, size+2);
+  write_n(buf, size+3);
 
   read_n(&status, 1);
 
@@ -166,20 +172,17 @@ static int send_track_map(unsigned char tr, const char *trackmap, unsigned char 
 
 static int read_gcr_block(unsigned char *se, unsigned char *gcrbuf)
 {
-    unsigned char s;
+    unsigned char buf[2];
 
-                                                                        SETSTATEDEBUG((void)0);
-    read_n(&s, 1);
-    *se = s;
-                                                                        SETSTATEDEBUG((void)0);
-    read_n(&s, 1);
+    read_n(buf, 2);
+    *se = buf[0];
 
-    if(s) {
-        return s;
+    if(buf[1]) {
+        return buf[1];
     }
-                                                                        SETSTATEDEBUG(DebugByteCount=0);
-    read_n(gcrbuf, GCRBUFSIZE);									
-                                                                        SETSTATEDEBUG(DebugByteCount=-1);
+
+    read_n(gcrbuf, GCRBUFSIZE);
+
     return 0;
 }
 

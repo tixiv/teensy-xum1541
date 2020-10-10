@@ -50,11 +50,11 @@ i1	lda $1800
 	bpl i1
 	rts
 
-
 gts	jsr gbyte
 	pha
 	jsr gbyte
 	tay
+	jsr gbyte ; dummy
 	pla
 	tax
 	rts
@@ -103,6 +103,8 @@ gblk
 	ldx $31
 	stx gblk_smc1+2
 	stx gblk_smc2+2
+	stx gblk_smc3+2
+	stx gblk_smc4+2
 
 	ldx #$00   ; 2
 
@@ -127,10 +129,8 @@ gblk_smc1
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
-	iny         ; 2
+	iny        ; 2
 
-:	lda $1800  ; 4
-	bmi :-     ; 2/3 ; wait ATN high
 	stx $1800  ; 4   ; clk high (sync)
 
 	lda $1800  ; 4   ; bit 7 and 5
@@ -148,8 +148,45 @@ gblk_smc2
 	
 	lda #$08   ; 2
 	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
 
-	iny         ; 2
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+gblk_smc3
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
+
+	stx $1800  ; 4   ; clk high (sync)
+
+	lda $1800  ; 4   ; bit 7 and 5
+	asl        ; 2
+	ora $1800  ; 4   ; bit 6 and 4
+	asl        ; 2
+	asl        ; 2
+	asl        ; 2
+	ora $1800  ; 4   ; bit 3 and 1
+	asl        ; 2
+	ora $1800  ; 4   ; bit 2 and 0
+
+gblk_smc4
+	sta $0400,y ; 5
+	
+	lda #$08   ; 2
+	sta $1800  ; 4   ; clk low (not ready anymore)
+	iny        ; 2
 
 	bne gblk_lp ; 3
 	rts
@@ -175,5 +212,7 @@ gbyte
 	stx $1800  ; 4   ; clk low (not ready anymore)
 
 	rts
-	
-	do_read=*
+
+.if * > $800
+.error "transfer code to large"
+.endif

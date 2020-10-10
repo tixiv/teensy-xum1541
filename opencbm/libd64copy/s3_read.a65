@@ -175,4 +175,6 @@ gbyte
 
 	rts
 	
-	do_read=*
+.if * > $800
+.error "transfer code to large"
+.endif

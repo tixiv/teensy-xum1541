@@ -16,8 +16,6 @@
 void
 s3_write_byte(uint8_t c)
 {
-    cli();
-
     iec_release(IO_ATN);
     while (iec_get(IO_CLK)); // sync with floppy
 
@@ -70,8 +68,6 @@ s3_write_byte(uint8_t c)
     iec_set(IO_ATN);
     iec_release(IO_CLK);
     iec_release(IO_DATA);
-
-    sei();
 }
 
 uint8_t
