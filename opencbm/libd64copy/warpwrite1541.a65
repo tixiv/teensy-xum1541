@@ -31,6 +31,8 @@
 
 ; 1541 Warp write
 
+.include        "address_layout.a65"
+
 	* = $0500
 
 	tr = $0a
@@ -46,13 +48,12 @@
 	retry_mode = $6a
 
 	write = $0146
-	retry = $06c0
 
-	get_ts     = $0700
-	get_byte   = $0703
-	get_block  = $0706
-	send_byte  = $0709
-	init	   = $070f
+	get_ts     = TRANSFER_CODE_START + $00
+	get_byte   = TRANSFER_CODE_START + $03
+	get_block  = TRANSFER_CODE_START + $06
+	send_byte  = TRANSFER_CODE_START + $09
+	init	     = TRANSFER_CODE_START + $0f
 
 	jmp main
 
@@ -156,3 +157,11 @@ isretry	lda #$03
 	beq legal
 	lda #$00
 	jmp $f969
+
+retry = *
+	; rom code will be copied here and patched
+	; $37 bytes length
+
+.if (retry + $37) >= TRANSFER_CODE_START
+.error "write code runs into transfer code"
+.endif

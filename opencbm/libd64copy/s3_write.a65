@@ -29,7 +29,9 @@
 ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 
-	*=$0700
+.include        "address_layout.a65"
+
+	* = TRANSFER_CODE_START
 
 TMP = $86
 
@@ -38,7 +40,7 @@ TMP = $86
 	jmp gblk	; receive block
 	jmp sbyte	; send byte
 	jmp sblk	; send block
-	
+
 	lda #$04
 i0	bit $1800
 	bne i0
@@ -47,6 +49,7 @@ i0	bit $1800
 i1	lda $1800
 	bpl i1
 	rts
+
 
 gts	jsr gbyte
 	pha

@@ -29,7 +29,9 @@
 ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 
-	*=$0700
+.include        "address_layout.a65"
+
+	* = TRANSFER_CODE_START
 
 TMP = $86
 

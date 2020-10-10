@@ -31,6 +31,8 @@
 
 ; 1541 Turbo write
 
+.include        "address_layout.a65"
+
 	*=$0500
 	
 	tr = $0a
@@ -47,10 +49,10 @@
 
 	do_write   = $0400
 
-	get_ts     = $0700
-	get_block  = $0706
-	send_byte  = $0709
-	init       = $070f
+	get_ts     = TRANSFER_CODE_START + $00
+	get_block  = TRANSFER_CODE_START + $06
+	send_byte  = TRANSFER_CODE_START + $09
+	init       = TRANSFER_CODE_START + $0f
 
 	jmp main
 
@@ -148,3 +150,9 @@ isretry	lda $026d	; flash
 	jmp $f969	; terminate job
 
 do_retry = *
+	; rom code will be copied here and patched
+	; $37 bytes length
+
+.if (do_retry + $37) >= TRANSFER_CODE_START
+.error "write code runs into transfer code"
+.endif

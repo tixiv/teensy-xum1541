@@ -36,6 +36,8 @@
 
 #define MAX_SECTORS  21
 
+#define TRANSFER_CODE_START 0x680
+
 #define NEED_SECTOR(b) ((((b)==bs_error)||((b)==bs_must_copy))?1:0)
 
 typedef int(*turbo_start)(CBM_FILE,unsigned char);

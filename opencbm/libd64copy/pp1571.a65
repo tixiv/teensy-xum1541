@@ -32,6 +32,8 @@
 
 ; XP1541 transfer routines
 
+.include        "address_layout.a65"
+
 .if .defined(Drive1541)
 	IEC_PORT   = $1800
 	PP_DATA    = $1801
@@ -54,7 +56,7 @@
 	IEC_PORT_DATA_IN  = $01
 	IEC_PORT_NONE     = $00
 
-	* = $0700
+	* = TRANSFER_CODE_START
 
 	jmp gts		; get track/sector
 	jmp gbyte	; get byte

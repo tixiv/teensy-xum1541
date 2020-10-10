@@ -105,9 +105,9 @@ static int open_disk(CBM_FILE fd, d64copy_settings *settings,
     opencbm_plugin_s3_write_n = cbm_get_plugin_function_address("opencbm_plugin_s3_write_n");
 
     if(for_writing)
-      cbm_upload(fd_cbm, d, 0x700, s3_drive_prog_write, sizeof(s3_drive_prog_write));
+      cbm_upload(fd_cbm, d, TRANSFER_CODE_START, s3_drive_prog_write, sizeof(s3_drive_prog_write));
     else
-      cbm_upload(fd_cbm, d, 0x700, s3_drive_prog_read, sizeof(s3_drive_prog_read));
+      cbm_upload(fd_cbm, d, TRANSFER_CODE_START, s3_drive_prog_read, sizeof(s3_drive_prog_read));
 
     start(fd, d);
 

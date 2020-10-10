@@ -29,6 +29,8 @@
 ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 
+.include        "address_layout.a65"
+
 	* = $0500
 
 	tr = $0a
@@ -42,10 +44,10 @@
 	retry_mode = $6a
 	bump_cnt   = $8d
 
-	get_ts     = $0700
-	send_byte  = $0709
-	send_block = $070c
-	init       = $070f
+	get_ts     = TRANSFER_CODE_START + $00
+	send_byte  = TRANSFER_CODE_START + $09
+	send_block = TRANSFER_CODE_START + $0c
+	init       = TRANSFER_CODE_START + $0f
 
 	do_read    = $0400
 
@@ -152,3 +154,9 @@ legal	lda #$03	; buffer address
 	jmp $99b5	; terminate job
 
 do_retry = *
+	; rom code will be copied here and patched
+	; $37 bytes length
+
+.if (do_retry + $37) >= TRANSFER_CODE_START
+.error "write code runs into transfer code"
+.endif

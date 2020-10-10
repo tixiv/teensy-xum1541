@@ -222,7 +222,7 @@ static int open_disk(CBM_FILE fd, d64copy_settings *settings,
     cbm_pp_read(fd_cbm);
 
                                                                         SETSTATEDEBUG((void)0);
-    cbm_upload(fd_cbm, d, 0x700, drive_prog, prog_size);
+    cbm_upload(fd_cbm, d, TRANSFER_CODE_START, drive_prog, prog_size);
                                                                         SETSTATEDEBUG((void)0);
     start(fd, d);
                                                                         SETSTATEDEBUG((void)0);

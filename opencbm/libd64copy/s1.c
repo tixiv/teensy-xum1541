@@ -217,7 +217,7 @@ static int open_disk(CBM_FILE fd, d64copy_settings *settings,
     opencbm_plugin_s1_write_n = cbm_get_plugin_function_address("opencbm_plugin_s1_write_n");
 
                                                                         SETSTATEDEBUG((void)0);
-    cbm_upload(fd_cbm, d, 0x700, s1_drive_prog, sizeof(s1_drive_prog));
+    cbm_upload(fd_cbm, d, TRANSFER_CODE_START, s1_drive_prog, sizeof(s1_drive_prog));
                                                                         SETSTATEDEBUG((void)0);
     start(fd, d);
                                                                         SETSTATEDEBUG((void)0);
