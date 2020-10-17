@@ -23,6 +23,9 @@
 #include "arch.h"
 #include "libmisc.h"
 
+#include <io.h>
+#include <fcntl.h>
+
 #define PRIMARY_ADDRESS_MIN 1
 #define PRIMARY_ADDRESS_MAX 30
 #define SECONDARY_ADDRESS_MIN 0
@@ -955,6 +958,8 @@ static int do_dir(CBM_FILE fd, OPTIONS * const options)
     } command = { NULL, NULL, 0, 0 };
 
     int rv;
+
+    _setmode(fileno( stdout ), O_TEXT);
 
     rv = skip_options(options);
 
